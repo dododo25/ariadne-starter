@@ -4,12 +4,15 @@ import com.dododo.ariadne.common.configuration.Configuration;
 import com.dododo.ariadne.common.job.AbstractJob;
 import com.dododo.ariadne.common.provider.FlowchartJobsProvider;
 import com.dododo.ariadne.core.model.State;
+import com.dododo.ariadne.drawio.provider.DrawIoFlowchartJobsProvider;
 import com.dododo.ariadne.starter.list.AddItemsOnlyList;
+import com.dododo.ariadne.xml.provider.XmlFlowchartJobsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +25,11 @@ public class Main {
 
     private static final Map<Class<? extends FlowchartJobsProvider>, Collection<String>> PROVIDER_PROFILES
             = new HashMap<>();
+
+    static {
+        PROVIDER_PROFILES.put(DrawIoFlowchartJobsProvider.class, Collections.singleton("drawio"));
+        PROVIDER_PROFILES.put(XmlFlowchartJobsProvider.class, Collections.singleton("xml"));
+    }
 
     public static void main(String... args) {
         try {
