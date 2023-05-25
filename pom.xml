@@ -9,6 +9,12 @@
     <version>0.0.1</version>
 
     <dependencies>
+        <dependency>
+            <groupId>com.dododo</groupId>
+            <artifactId>common</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>
             <groupId>org.slf4j</groupId>
