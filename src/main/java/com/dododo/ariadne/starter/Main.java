@@ -2,9 +2,11 @@ package com.dododo.ariadne.starter;
 
 import com.dododo.ariadne.common.configuration.Configuration;
 import com.dododo.ariadne.common.job.AbstractJob;
+import com.dododo.ariadne.common.provider.CommonFlowchartJobsProvider;
 import com.dododo.ariadne.common.provider.FlowchartJobsProvider;
 import com.dododo.ariadne.core.model.State;
 import com.dododo.ariadne.drawio.provider.DrawIoFlowchartJobsProvider;
+import com.dododo.ariadne.renpy.provider.RenPyFlowchartJobsProvider;
 import com.dododo.ariadne.starter.list.AddItemsOnlyList;
 import com.dododo.ariadne.xml.provider.XmlFlowchartJobsProvider;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ public class Main {
 
     static {
         PROVIDER_PROFILES.put(DrawIoFlowchartJobsProvider.class, Collections.singleton("drawio"));
+        PROVIDER_PROFILES.put(RenPyFlowchartJobsProvider.class, Collections.singleton("renpy"));
         PROVIDER_PROFILES.put(XmlFlowchartJobsProvider.class, Collections.singleton("xml"));
     }
 
@@ -35,15 +38,14 @@ public class Main {
         try {
             Configuration configuration = createConfiguration();
 
-            FlowchartJobsProvider inputProvider =
-                    prepareProvider(configuration.getInputProfile());
-            FlowchartJobsProvider outputProvider =
-                    prepareProvider(configuration.getOutputProfile());
+            FlowchartJobsProvider inputProvider = prepareProvider(configuration.getInputProfile());
+            FlowchartJobsProvider innerProvider = prepareInnerProvider();
+            FlowchartJobsProvider outputProvider = prepareProvider(configuration.getOutputProfile());
 
             inputProvider.setConfiguration(configuration);
             outputProvider.setConfiguration(configuration);
 
-            run(configuration, inputProvider, outputProvider);
+            run(configuration, inputProvider, innerProvider, outputProvider);
         } catch (ReflectiveOperationException e) {
             LOG.error(e.getMessage(), e);
         }
@@ -117,5 +119,9 @@ public class Main {
                 .orElseThrow(IllegalArgumentException::new);
 
         return providerType.getDeclaredConstructor().newInstance();
+    }
+
+    private static FlowchartJobsProvider prepareInnerProvider() {
+        return new CommonFlowchartJobsProvider();
     }
 }
