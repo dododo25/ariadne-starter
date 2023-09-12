@@ -9,6 +9,7 @@ import com.dododo.ariadne.drawio.provider.DrawIoFlowchartJobsProvider;
 import com.dododo.ariadne.renpy.rpy.provider.RenPyFlowchartJobsProvider;
 import com.dododo.ariadne.renpy.unity.provider.UnityFlowchartJobsProvider;
 import com.dododo.ariadne.starter.list.AddItemsOnlyList;
+import com.dododo.ariadne.thread.provider.ThreadFlowchartJobsProvider;
 import com.dododo.ariadne.xml.provider.XmlFlowchartJobsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class Main {
             = new HashMap<>();
 
     static {
+        PROVIDER_PROFILES.put(ThreadFlowchartJobsProvider.class, Collections.singleton("ariadne"));
         PROVIDER_PROFILES.put(DrawIoFlowchartJobsProvider.class, Collections.singleton("drawio"));
         PROVIDER_PROFILES.put(RenPyFlowchartJobsProvider.class, Collections.singleton("renpy"));
         PROVIDER_PROFILES.put(UnityFlowchartJobsProvider.class, Collections.singleton("unity"));

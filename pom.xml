@@ -29,6 +29,12 @@
         </dependency>
         <dependency>
             <groupId>com.dododo</groupId>
+            <artifactId>thread</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.dododo</groupId>
             <artifactId>xml</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
