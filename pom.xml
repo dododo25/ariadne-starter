@@ -39,7 +39,38 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <descriptor />
     </properties>
+
+    <profiles>
+        <profile>
+            <id>all-to-all</id>
+            <properties>
+                <descriptor>src/main/resources/jar-all-to-all.xml</descriptor>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>renpy-to-drawio</id>
+            <properties>
+                <descriptor>src/main/resources/jar-renpy-to-drawio.xml</descriptor>
+            </properties>
+        </profile>
+        <profile>
+            <id>unity-to-drawio</id>
+            <properties>
+                <descriptor>src/main/resources/jar-unity-to-drawio.xml</descriptor>
+            </properties>
+        </profile>
+        <profile>
+            <id>xml-to-drawio</id>
+            <properties>
+                <descriptor>src/main/resources/jar-xml-to-drawio.xml</descriptor>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -51,10 +82,19 @@
                             <mainClass>com.dododo.ariadne.starter.Main</mainClass>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <descriptors>
+                        <descriptor>${descriptor}</descriptor>
+                    </descriptors>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
