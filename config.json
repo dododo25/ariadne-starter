@@ -1,0 +1,41 @@
+{
+    "flags": {
+        "loadReply":  false
+    },
+    "input": {
+        "profile": "renpy",
+        "files": [
+            "D:\\projects\\java\\ariadne\\starter\\es\\prologue.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\day1.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\day2.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\day3.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\day4.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\day5.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\day6.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\day7.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\epilogue.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\epilogue_mi.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\epilogue_uv.rpy",
+            "D:\\projects\\java\\ariadne\\starter\\es\\endings.rpy"
+        ]
+    },
+    "output": {
+        "profile": "drawio",
+        "directory": {
+            "relative": true,
+            "path": "."
+        }
+    },
+    "excludes": [
+        "^\\$\\s*persistent.*$",
+        "^\\$\\s*preferences.*$",
+        "^\\$\\s*new_chapter.*$",
+        "^\\$\\s*renpy.*$",
+        "^\\$\\s*volume.*",
+        "^\\$\\s*set_mode_adv.*$",
+        "^\\$\\s*set_mode_nvl.*$",
+        "^\\$\\s*backdrop.*$",
+        "^\\$\\s*(prolog|day|sunset|night)_time.*$",
+        "^\\$\\s*reload_names.*$"
+    ]
+}

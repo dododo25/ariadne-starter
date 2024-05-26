@@ -5,52 +5,67 @@ import com.dododo.ariadne.common.job.AbstractJob;
 import com.dododo.ariadne.common.provider.CommonFlowchartJobsProvider;
 import com.dododo.ariadne.common.provider.FlowchartJobsProvider;
 import com.dododo.ariadne.core.model.State;
-import com.dododo.ariadne.drawio.provider.DrawIoFlowchartJobsProvider;
-import com.dododo.ariadne.renpy.rpy.provider.RenPyFlowchartJobsProvider;
-import com.dododo.ariadne.renpy.unity.provider.UnityFlowchartJobsProvider;
 import com.dododo.ariadne.starter.list.AddItemsOnlyList;
-import com.dododo.ariadne.thread.provider.ThreadFlowchartJobsProvider;
-import com.dododo.ariadne.xml.provider.XmlFlowchartJobsProvider;
+import com.dododo.ariadne.starter.reader.ConfigurationReader;
+import com.dododo.ariadne.starter.reader.JsonConfigurationReader;
+import com.dododo.ariadne.starter.reader.PropertiesConfigurationReader;
+import com.dododo.ariadne.starter.reader.XmlConfigurationReader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    private static final Map<Class<? extends FlowchartJobsProvider>, Collection<String>> PROVIDER_PROFILES
-            = new HashMap<>();
+    public static void main(String... args) {
+        HelpFormatter formatter = new HelpFormatter();
 
-    static {
-        PROVIDER_PROFILES.put(ThreadFlowchartJobsProvider.class, Collections.singleton("ariadne"));
-        PROVIDER_PROFILES.put(DrawIoFlowchartJobsProvider.class, Collections.singleton("drawio"));
-        PROVIDER_PROFILES.put(RenPyFlowchartJobsProvider.class, Collections.singleton("renpy"));
-        PROVIDER_PROFILES.put(UnityFlowchartJobsProvider.class, Collections.singleton("unity"));
-        PROVIDER_PROFILES.put(XmlFlowchartJobsProvider.class, Collections.singleton("xml"));
+        OptionGroup group = new OptionGroup()
+                .addOption(new Option(null, "json", true, "path to *.json configuration file"))
+                .addOption(new Option(null, "xml", true, "path to *.xml configuration file"));
+
+        Options options = new Options()
+                .addOption("h", "help", false, "print help")
+                .addOptionGroup(group);
+
+        try {
+            CommandLine line = new DefaultParser()
+                    .parse(options, args);
+
+            if (line.hasOption("help")) {
+                formatter.printHelp("java -jar [-VM options] ariadne", options, true);
+            } else {
+                start(line.getOptionValue("xml"), line.getOptionValue("json"));
+            }
+        } catch (ParseException e) {
+            formatter.printHelp("java -jar [-VM options] ariadne", options, true);
+        }
     }
 
-    public static void main(String... args) {
-        try {
-            Configuration configuration = createConfiguration();
+    private static void start(String xmlValue, String jsonValue) {
+        try(ConfigurationReader reader = prepareReader(xmlValue, jsonValue)) {
+            Configuration configuration = reader.read();
 
-            FlowchartJobsProvider inputProvider = prepareProvider(configuration.getInputProfile());
-            FlowchartJobsProvider innerProvider = prepareInnerProvider();
+            FlowchartJobsProvider inputProvider  = prepareProvider(configuration.getInputProfile());
+            FlowchartJobsProvider innerProvider  = prepareInnerProvider();
             FlowchartJobsProvider outputProvider = prepareProvider(configuration.getOutputProfile());
 
             inputProvider.setConfiguration(configuration);
             outputProvider.setConfiguration(configuration);
 
             run(configuration, inputProvider, innerProvider, outputProvider);
-        } catch (ReflectiveOperationException e) {
+        } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }
     }
@@ -76,53 +91,48 @@ public class Main {
         }
     }
 
-    private static Configuration createConfiguration() {
-        Properties properties = new Properties();
-
-        System.getProperties().stringPropertyNames()
-                .stream()
-                .filter(key -> key.startsWith("flowchart"))
-                .forEach(key -> properties.setProperty(key, System.getProperty(key)));
-
-        validateProperties(properties);
-        prepareProperties(properties);
-
-        return Configuration.create(properties);
-    }
-
-    private static void validateProperties(Properties properties) {
-        validateProperty(properties, "flowchart.input.profile");
-        validateProperty(properties, "flowchart.output.profile");
-
-        boolean b = properties.stringPropertyNames().stream().anyMatch(k -> k.startsWith("flowchart.input.file"));
-
-        if (!b) {
-            throw new IllegalArgumentException("Config file must contain at least one 'flowchart.input.file' property");
-        }
-    }
-
-    private static void validateProperty(Properties properties, String key) {
-        if (!properties.containsKey(key)) {
-            throw new IllegalArgumentException(String.format("Config file must contain '%s' property", key));
-        }
-    }
-
-    private static void prepareProperties(Properties properties) {
-        if (!properties.containsKey("flowchart.output.directory")) {
-            properties.setProperty("flowchart.output.directory", ".");
-        }
-    }
-
     private static FlowchartJobsProvider prepareProvider(String value)
             throws ReflectiveOperationException {
-        Class<? extends FlowchartJobsProvider> providerType = PROVIDER_PROFILES.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().contains(value))
-                .findAny()
-                .map(Map.Entry::getKey)
-                .orElseThrow(IllegalArgumentException::new);
+        Class<?> providerType;
+        ClassLoader loader = ClassLoader.getSystemClassLoader();
 
-        return providerType.getDeclaredConstructor().newInstance();
+        try {
+            switch (value) {
+                case "ariadne":
+                    providerType = loader.loadClass("com.dododo.ariadne.thread.provider.ThreadFlowchartJobsProvider");
+                    break;
+                case "drawio":
+                    providerType = loader.loadClass("com.dododo.ariadne.drawio.provider.DrawIoFlowchartJobsProvider");
+                    break;
+                case "renpy":
+                    providerType = loader.loadClass("com.dododo.ariadne.renpy.rpy.provider.RenPyFlowchartJobsProvider");
+                    break;
+                case "xml":
+                    providerType = loader.loadClass("com.dododo.ariadne.xml.provider.XmlFlowchartJobsProvider");
+                    break;
+                case "unity":
+                    providerType = loader.loadClass("com.dododo.ariadne.renpy.unity.provider.UnityFlowchartJobsProvider;");
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("Can`t find provider class for %s", value));
+            }
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(String.format("Can`t find provider class for %s", value), e);
+        }
+
+        return (FlowchartJobsProvider) providerType.getDeclaredConstructor().newInstance();
+    }
+
+    private static ConfigurationReader prepareReader(String xmlValue, String jsonValue) throws Exception {
+        if (xmlValue != null) {
+            return new XmlConfigurationReader(xmlValue);
+        }
+
+        if (jsonValue != null) {
+            return new JsonConfigurationReader(jsonValue);
+        }
+
+        return new PropertiesConfigurationReader();
     }
 
     private static FlowchartJobsProvider prepareInnerProvider() {
