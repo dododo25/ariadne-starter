@@ -3,6 +3,7 @@ package com.dododo.ariadne.starter;
 import com.dododo.ariadne.core.configuration.Configuration;
 import com.dododo.ariadne.core.job.AbstractJob;
 import com.dododo.ariadne.core.model.State;
+import com.dododo.ariadne.core.provider.CommonFlowchartJobsProvider;
 import com.dododo.ariadne.core.provider.FlowchartJobsProvider;
 import com.dododo.ariadne.starter.list.AddItemsOnlyList;
 import com.dododo.ariadne.starter.reader.ConfigurationReader;
@@ -57,12 +58,13 @@ public class Main {
             Configuration configuration = reader.read();
 
             FlowchartJobsProvider inputProvider  = prepareProvider(configuration.getInputProfile());
+            FlowchartJobsProvider innerProvider  = prepareInnerProvider();
             FlowchartJobsProvider outputProvider = prepareProvider(configuration.getOutputProfile());
 
             inputProvider.setConfiguration(configuration);
             outputProvider.setConfiguration(configuration);
 
-            run(configuration, inputProvider, outputProvider);
+            run(configuration, inputProvider, innerProvider, outputProvider);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }
@@ -96,6 +98,9 @@ public class Main {
 
         try {
             switch (value) {
+                case "drawio":
+                    providerType = loader.loadClass("com.dododo.ariadne.drawio.provider.DrawIoFlowchartJobsProvider");
+                    break;
                 case "renpy":
                     providerType = loader.loadClass("com.dododo.ariadne.renpy.provider.RenPyFlowchartJobsProvider");
                     break;
@@ -122,5 +127,9 @@ public class Main {
         }
 
         return new PropertiesConfigurationReader();
+    }
+
+    private static FlowchartJobsProvider prepareInnerProvider() {
+        return new CommonFlowchartJobsProvider();
     }
 }
