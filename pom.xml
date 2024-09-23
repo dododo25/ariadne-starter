@@ -5,10 +5,10 @@
 
     <groupId>com.dododo.ariadne</groupId>
     <artifactId>ariadne-starter</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.1</version>
 
     <properties>
-        <ariadne.version>0.1.2</ariadne.version>
+        <ariadne.version>0.2.1</ariadne.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -27,7 +27,12 @@
         </dependency>
         <dependency>
             <groupId>com.dododo.ariadne</groupId>
-            <artifactId>renpy</artifactId>
+            <artifactId>renpy-rpy</artifactId>
+            <version>${ariadne.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dododo.ariadne</groupId>
+            <artifactId>renpy-unity</artifactId>
             <version>${ariadne.version}</version>
         </dependency>
         <dependency>

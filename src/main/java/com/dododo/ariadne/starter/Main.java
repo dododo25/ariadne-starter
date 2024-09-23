@@ -3,7 +3,7 @@ package com.dododo.ariadne.starter;
 import com.dododo.ariadne.core.configuration.Configuration;
 import com.dododo.ariadne.core.job.AbstractJob;
 import com.dododo.ariadne.core.model.State;
-import com.dododo.ariadne.core.provider.CommonFlowchartJobsProvider;
+import com.dododo.ariadne.core.provider.CoreFlowchartJobsProvider;
 import com.dododo.ariadne.core.provider.FlowchartJobsProvider;
 import com.dododo.ariadne.starter.list.AddItemsOnlyList;
 import com.dododo.ariadne.starter.reader.ConfigurationReader;
@@ -104,6 +104,9 @@ public class Main {
                 case "renpy":
                     providerType = loader.loadClass("com.dododo.ariadne.renpy.provider.RenPyFlowchartJobsProvider");
                     break;
+                case "unity":
+                    providerType = loader.loadClass("com.dododo.ariadne.renpy.provider.UnityFlowchartJobsProvider");
+                    break;
                 case "xml":
                     providerType = loader.loadClass("com.dododo.ariadne.xml.provider.XmlFlowchartJobsProvider");
                     break;
@@ -130,6 +133,6 @@ public class Main {
     }
 
     private static FlowchartJobsProvider prepareInnerProvider() {
-        return new CommonFlowchartJobsProvider();
+        return new CoreFlowchartJobsProvider();
     }
 }
